@@ -1,6 +1,6 @@
 [package]
 name = "dogrun-media-download"
-version = "0.1.0"
+version = "0.1.1"
 description = "DogRun Media Download desktop app powered by yt-dlp and ffmpeg"
 authors = ["DogRun Labs"]
 edition = "2021"

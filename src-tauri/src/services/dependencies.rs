@@ -4,6 +4,7 @@ use std::path::{Component, Path, PathBuf};
 use crate::models::{DependencyStatus, ToolStatus};
 
 const REQUIRED_TOOLS: [&str; 3] = ["yt-dlp", "ffmpeg", "ffprobe"];
+const WINDOWS_TARGET_TRIPLE: &str = "x86_64-pc-windows-msvc";
 
 pub fn check() -> DependencyStatus {
     let tools: Vec<ToolStatus> = REQUIRED_TOOLS.iter().map(|tool| check_tool(tool)).collect();
@@ -66,7 +67,7 @@ fn executable_names(name: &str) -> Vec<String> {
 }
 
 fn find_bundled_executable(name: &str) -> Option<PathBuf> {
-    let candidates = executable_names(name);
+    let candidates = bundled_executable_names(name);
     for directory in bundled_tool_directories() {
         for candidate in &candidates {
             let path = directory.join(candidate);
@@ -77,6 +78,17 @@ fn find_bundled_executable(name: &str) -> Option<PathBuf> {
     }
 
     None
+}
+
+fn bundled_executable_names(name: &str) -> Vec<String> {
+    let mut names = executable_names(name);
+    let base_name = name
+        .strip_suffix(".exe")
+        .or_else(|| name.strip_suffix(".EXE"))
+        .unwrap_or(name);
+
+    names.push(format!("{base_name}-{WINDOWS_TARGET_TRIPLE}.exe"));
+    names
 }
 
 fn bundled_tool_directories() -> Vec<PathBuf> {
